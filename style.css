@@ -1,0 +1,333 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+body {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    grid-template-rows: 125px 1fr;
+}
+
+#header {
+    background-color: #484848;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 35px;
+    grid-column: 1 / 3;
+}
+
+#sidebar {
+    background-color: #e1e1e1;
+    padding: 30px;
+}
+
+#constant-buttons,
+#projects,
+#project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#projects {
+    margin-top: 20px;
+}
+
+.side-button,
+#add-task {
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    font-size: 17px;
+    text-align: left;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+}
+
+.side-button > svg,
+#add-task > svg {
+    width: 25px;
+}
+
+.side-button:hover,
+#add-task:hover {
+    background-color: #bebebe;
+}
+
+.project-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    height: 75px;
+}
+
+.project-form > input {
+    grid-column: 1 / 3;
+    font-size: 20px;
+    border: none;
+    border-radius: 10px;
+    padding-left: 10px;
+}
+
+.project-form > button {
+    border: 2px solid #484848;
+    background-color: white;
+    color: #484848;
+    font-size: 20px;
+    border-radius: 10px;
+}
+
+.project-form > button:hover {
+    color: white;
+    background-color: #484848;
+}
+
+#main {
+    display: flex;
+    flex-direction: column;
+    padding-left: 100px;
+    padding-right: 30%;
+    padding-top: 50px;
+    min-width: min-content;
+}
+
+#main > h2 {
+    font-size: 30px;
+    margin-bottom: 15px;
+    white-space: nowrap;
+}
+
+#form-background {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+#task-form {
+    background-color: white;
+    position: fixed;
+    top: 200px;
+    left: calc(50% - 250px);
+    height: 250px;
+    width: 500px;
+    border-radius: 15px;
+    padding: 20px;
+    font-size: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#task-form > div > input {
+    width: 100%;
+    height: 30px;
+    font-size: 20px;
+    padding: 5px;
+}
+
+#task-form > div > label {
+    white-space: nowrap;
+}
+
+#task-form > div {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#add-task-button,
+#confirm-edit-button {
+    width: 35%;
+    height: 40px;
+    margin: auto;
+    font-size: 25px;
+    border: 2px solid #484848;
+    border-radius: 15px;
+    color: #484848;
+    background-color: white;
+}
+
+#add-task-button:hover,
+#confirm-edit-button:hover {
+    color: white;
+    background-color: #484848;
+}
+
+input[type='radio'] {
+    display: none;
+}
+
+#low + label {
+    border: 2px solid #15803d;
+    color: #15803d;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+#med + label {
+    border: 2px solid #fbbf24;
+    color: #fbbf24;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+#high + label {
+    border: 2px solid #b91c1c;
+    color: #b91c1c;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+#low:checked + label,
+#low:hover + label {
+    background-color: #15803d;
+    color: white;
+}
+
+#med:checked + label,
+#med:hover + label {
+    background-color: #fbbf24;
+    color: white;
+}
+
+#high:checked + label,
+#high:hover + label {
+    background-color: #b91c1c;
+    color: white;
+}
+
+.task-module {
+    height: 30px;
+    width: minmax(min-content, 100%);
+    border: 2px solid #484848;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 10px;
+}
+
+.task-module:hover {
+    scale: 1.02
+}
+
+.task-sub-module-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.task-sub-module {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.task-sub-module svg {
+    width: 25px;
+    min-width: 25px;
+}
+
+#add-task {
+    white-space: nowrap;
+    min-width: min-content;
+}
+
+.edit-task,
+.delete-task {
+    width: min-content;
+    border: none;
+    background-color: white;
+    margin-top: 2px;
+}
+
+.edit-task:hover,
+.delete-task:hover {
+    fill: darkgray;
+}
+
+.priority-low {
+    background-color: #15803d;
+    color: white;
+    padding: 3px;
+    border-radius: 3px;
+}
+
+.priority-medium {
+    background-color: #fbbf24;
+    color: white;
+    padding: 3px;
+    border-radius: 3px;
+}
+
+.priority-high {
+    background-color: #b91c1c;
+    color: white;
+    padding: 3px;
+    border-radius: 3px;
+}
+
+.check-box {
+    background-color: white;
+    border: 2px solid #484848;
+    border-radius: 3px;
+    width: 1.5em;
+    height: 1.5em;
+}
+
+.checked {
+    background-color: rgb(154, 154, 154);
+}
+
+
+#show-checked-button {
+    border: 2px solid #484848;
+    width: 60px;
+    height: 40px;
+    border-radius: 5px;
+}
+
+.showing-checked {
+    background-color: #484848;
+    color: white;
+}
+
+.showing-unchecked {
+    background-color: white;
+    color: #484848;
+}
+
+.project-header {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.project-header > h2 {
+    font-size: 35px;
+}
+
+.remove-project-button {
+    width: 40px;
+    border: none;
+    background-color: transparent;
+}
+
+.remove-project-button:hover {
+    fill: darkgray;
+}
