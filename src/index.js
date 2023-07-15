@@ -1,6 +1,6 @@
 import { Project } from './project.js';
 import { Task } from './task.js';
-import { format, add, isToday, isThisWeek } from 'date-fns';
+import { format, add, isToday, isThisWeek, parseISO } from 'date-fns';
 
 const homeBtn = document.querySelector('#home-btn');
 const todayBtn = document.querySelector('#today-btn');
@@ -28,18 +28,26 @@ weekBtn.addEventListener('click', () => {
 addProjectBtn.addEventListener('click', projectForm);
 
 let projectList = [];
-let currProject;
 
+if (JSON.parse(localStorage.getItem('projects')) != null) {
+    let items = JSON.parse(localStorage.getItem('projects'));
+    for (const item of items) {
+        const newProject = new Project(item._name, item._tasks);
+        projectList.push(newProject);
 
-let homeProject = new Project('Home');
-let todayProject = new Project('Today');
-let thisWeekProject = new Project('This Week');
-let myProject = new Project('My Project');
-projectList.push(myProject);
+        for (let i = 0; i < item._tasks.length; i++) {
+            item._tasks[i]._dueDate = parseISO(item._tasks[i]._dueDate.split().slice(0, 10).join(""));
+        }
+    }
+} 
+
+let homeProject = new Project('Home', []);
+let todayProject = new Project('Today', []);
+let thisWeekProject = new Project('This Week', []);
+let currProject = homeProject;
 renderProjects();   
 homeBtn.style.fontWeight = 'bold';
 showAll();
-
 
 function projectForm() {
     addProjectBtn.style.display = 'none';
@@ -67,8 +75,9 @@ function projectForm() {
 function addProject(form) {
     let name = document.querySelector('#project-name').value;
     if (name != '') {
-        const project = new Project(name);
+        const project = new Project(name, []);
         projectList.push(project);
+        localStorage.setItem('projects', JSON.stringify(projectList));
         currProject = project;
         endProjectForm(form);
         renderProjects();
@@ -166,13 +175,14 @@ function renderTasks() {
 
         const checkBox = document.createElement('button');
         checkBox.classList.add('check-box');
-        if (currProject.tasks[i].checked) {
+        if (currProject.tasks[i]._checked) {
             checkBox.classList.add('checked');
         }
         checkBox.addEventListener('click', () => {
-            currProject.tasks[i].toggleChecked();
+            currProject._tasks[i]._checked = !currProject._tasks[i]._checked;
             checkBox.classList.toggle('checked');
             displayProject();
+            localStorage.setItem('projects', JSON.stringify(projectList));
         });
         task.appendChild(checkBox);
 
@@ -183,14 +193,17 @@ function renderTasks() {
         taskLeft.classList.add('task-sub-module');
 
         const taskName = document.createElement('p');
-        taskName.textContent = `${currProject.tasks[i].title}`;
-        if (currProject.tasks[i].checked) {
+        taskName.textContent = `${currProject.tasks[i]._title}`;
+        if (currProject.tasks[i]._checked) {
             taskName.style.textDecoration = 'line-through';
         }
         taskLeft.appendChild(taskName);
 
-        taskLeft.innerHTML += `<p>${format(currProject.tasks[i].dueDate, 'eee, MMM d')}</p>`;
-        taskLeft.innerHTML += `<div class="priority-${currProject.tasks[i].priority}"><p>${currProject.tasks[i].priority}</p></div>`;
+        const tempDate = add(currProject._tasks[i]._dueDate, {
+            days: 1
+        });
+        taskLeft.innerHTML += `<p>${format(tempDate, 'eee, MMM d')}</p>`;
+        taskLeft.innerHTML += `<div class="priority-${currProject.tasks[i]._priority}"><p>${currProject.tasks[i]._priority}</p></div>`;
 
         div.appendChild(taskLeft);
 
@@ -228,6 +241,7 @@ function renderTasks() {
             } else if (currProject === thisWeekProject) {
                 showThisWeek();
             }
+            localStorage.setItem('projects', JSON.stringify(projectList));
         });
         taskRight.appendChild(deleteTaskBtn);
         div.appendChild(taskRight);
@@ -251,9 +265,7 @@ function addTask() {
     if (document.querySelector('#title').value != '' &&
     document.querySelector('#date').value != '') {
         const title = document.querySelector('#title').value;
-        const date = add(new Date(document.querySelector('#date').value), {
-            days: 1
-        });
+        const dueDate = new Date(document.querySelector('#date').valueAsDate);
         let priority = '';
         if (document.querySelector('#low').checked) {
             priority = 'low';
@@ -262,8 +274,9 @@ function addTask() {
         } else {
             priority = 'high';
         }
-        const task = new Task(title, date, priority, false);
+        const task = new Task(title, dueDate, priority, false);
         currProject.tasks.push(task);
+        localStorage.setItem('projects', JSON.stringify(projectList));
         taskForm.reset();
         formBackground.style.display = 'none';
         displayProject(currProject);
@@ -281,11 +294,11 @@ function boldButtons(button) {
 function editTask(task) {
     showTaskForm();
     addTaskBtn.style.display = 'none';
-    document.querySelector('#title').value = task.title;
-    document.querySelector('#date').value = format(task.dueDate, 'yyyy-MM-dd').toString();
-    if (task.priority == 'low') {
+    document.querySelector('#title').value = task._title;
+    document.querySelector('#date').valueAsDate = task._dueDate;
+    if (task._priority == 'low') {
         document.querySelector('#low').checked = true;
-    } else if (task.priority == 'medium') {
+    } else if (task._priority == 'medium') {
         document.querySelector('#med').checked = true;
     } else {
         document.querySelector('#high').checked = true;
@@ -297,22 +310,21 @@ function editTask(task) {
     taskForm.appendChild(confirmEditBtn);
 
     confirmEditBtn.addEventListener('click', () => {
-        task.title = document.querySelector('#title').value;
-        task.dueDate = add(new Date(document.querySelector('#date').value), {
-            days: 1
-        });
+        task._title = document.querySelector('#title').value;
+        task._dueDate = new Date(document.querySelector('#date').valueAsDate);
         if (document.querySelector('#low').checked) {
-            task.priority = 'low';
+            task._priority = 'low';
         } else if (document.querySelector('#med').checked) {
-            task.priority = 'medium';
+            task._priority = 'medium';
         } else {
-            task.priority = 'high';
+            task._priority = 'high';
         }
         taskForm.reset();
         displayProject(currProject);
         confirmEditBtn.remove();
         addTaskBtn.style.display = 'block';
         formBackground.style.display = 'none';
+        localStorage.setItem('projects', JSON.stringify(projectList));
     });
 
     window.addEventListener('click', e => {
@@ -329,7 +341,7 @@ function showAll() {
         for (let j = 0; j < projectList[i].tasks.length; j++) {
             allTasks.push(projectList[i].tasks[j]);
         }
-    }
+    } 
 
     homeProject.tasks = allTasks;
     currProject = homeProject;
@@ -368,6 +380,7 @@ function deleteProject() {
     currProject = homeProject;
     homeBtn.style.fontWeight = 'bold';
     projectList.splice(projectList.indexOf(currProject), 1);
+    localStorage.setItem('projects', JSON.stringify(projectList));
     renderProjects();
     showAll();
 }
